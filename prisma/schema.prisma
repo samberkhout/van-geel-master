@@ -1,0 +1,44 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Model voor het oppotten formulier
+model Oppotten {
+  id            Int      @id @default(autoincrement())
+  leverweek     Int
+  ras           String
+  aantalOpgepot Int
+  aantalWeggooi Int
+  redenWeggooi  String
+  andereReden   String?  // Optioneel veld
+  createdAt     DateTime @default(now())
+}
+
+// Model voor het trips formulier
+model Trips {
+  id           Int      @id @default(autoincrement())
+  soort        String   // Bijvoorbeeld: het ras of de variëteit
+  leverweek    Int
+  oppotweek    Int
+  aantalPlanten Int
+  locatie      String
+  createdAt    DateTime @default(now())
+}
+
+// Model voor het ziek zoeken formulier
+model ZiekZoeken {
+  id           Int      @id @default(autoincrement())
+  leverweek    Int
+  ras          String
+  aantalWeggooi Int
+  redenWeggooi String
+  andereReden  String?  // Optioneel veld
+  createdAt    DateTime @default(now())
+}
