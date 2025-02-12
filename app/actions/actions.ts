@@ -68,13 +68,13 @@ export async function getUsers() {
 export async function addUser(name: string, email: string, password: string, rol: string) {
     rol = (rol === "Beheerder") ? "ADMIN" : "USER";
 
-    password = await bcrypt.hash(password, rol);
+    password = await bcrypt.hash(password, 10);
     await prisma.user.create({
         data: {
             name,
             email,
             password,
-            rol: rol as "USER" | "ADMIN", // Typecasting naar enum waarde
+            rol: rol as "USER" | "ADMIN",
         },
     });
     revalidatePath("admin/beheer/accounts");
