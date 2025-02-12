@@ -1,8 +1,11 @@
 ﻿'use client';
 
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, FormEvent } from 'react';
 import Header from '@/components/Header';
 import { useLanguage } from '@/context/LanguageContext';
+import ProtectedLayout from '@/components/ProtectedLayout';
+import RasSelect from '@/components/RasSelect';
+import { addZiekZoeken } from "@/app/actions/actions";
 
 interface ZiekZoekenFormData {
     leverweek: number;
@@ -12,36 +15,7 @@ interface ZiekZoekenFormData {
     andereReden: string;
 }
 
-interface Reden {
-    label: string;
-    value: string;
-}
-
-const redenen: Reden[] = [
-    { label: 'Ziekte', value: 'ziekte' },
-    { label: 'Schade', value: 'schade' },
-    { label: 'Overproductie', value: 'overproductie' },
-    { label: 'Anders', value: 'anders' },
-];
-
-type Translation = {
-    title: string;
-    leverweekLabel: string;
-    rasLabel: string;
-    aantalWeggooiLabel: string;
-    redenWeggooiLabel: string;
-    andereRedenLabel: string;
-    submitButton: string;
-    successMessage: string;
-    errorMessage: string;
-    infoLeverweek: string;
-    infoRas: string;
-    infoAantalWeggooi: string;
-    infoRedenWeggooi: string;
-    infoAndereReden: string;
-};
-
-const translations: Record<'nl' | 'en' | 'pl', Translation> = {
+const translations = {
     nl: {
         title: "Ziek Zoeken",
         leverweekLabel: "Leverweek",
@@ -52,72 +26,12 @@ const translations: Record<'nl' | 'en' | 'pl', Translation> = {
         submitButton: "Verzenden",
         successMessage: "Formulier succesvol ingediend!",
         errorMessage: "Vul alle velden in.",
-        infoLeverweek: "Geef de week van levering aan.",
-        infoRas: "Geef het ras van de planten aan.",
-        infoAantalWeggooi: "Aantal planten die weggegooid worden.",
-        infoRedenWeggooi: "Reden waarom de planten weggegooid worden.",
-        infoAndereReden: "Specificeer een andere reden.",
     },
-    en: {
-        title: "Disease Search",
-        leverweekLabel: "Delivery Week",
-        rasLabel: "Variety",
-        aantalWeggooiLabel: "Number Discarded",
-        redenWeggooiLabel: "Reason for Discarding",
-        andereRedenLabel: "Other Reason",
-        submitButton: "Submit",
-        successMessage: "Form successfully submitted!",
-        errorMessage: "Please fill in all required fields.",
-        infoLeverweek: "Enter the delivery week.",
-        infoRas: "Enter the variety of the plants.",
-        infoAantalWeggooi: "Number of plants discarded.",
-        infoRedenWeggooi: "Reason for discarding the plants.",
-        infoAndereReden: "Specify another reason.",
-    },
-    pl: {
-        title: "Wyszukiwanie chorób",
-        leverweekLabel: "Tydzień dostawy",
-        rasLabel: "Odmiana",
-        aantalWeggooiLabel: "Liczba wyrzuconych",
-        redenWeggooiLabel: "Powód wyrzucenia",
-        andereRedenLabel: "Inny powód",
-        submitButton: "Wyślij",
-        successMessage: "Formularz został pomyślnie wysłany!",
-        errorMessage: "Wypełnij wszystkie pola.",
-        infoLeverweek: "Podaj tydzień dostawy.",
-        infoRas: "Podaj odmianę roślin.",
-        infoAantalWeggooi: "Liczba wyrzuconych roślin.",
-        infoRedenWeggooi: "Powód wyrzucenia roślin.",
-        infoAndereReden: "Określ inny powód.",
-    },
-};
-
-type InfoIconProps = {
-    text: string;
-};
-
-const InfoIcon: React.FC<InfoIconProps> = ({ text }) => {
-    const [show, setShow] = useState(false);
-    return (
-        <span className="relative inline-block ml-1">
-      <span className="cursor-pointer text-blue-500" onClick={() => setShow(!show)}>
-        ℹ️
-      </span>
-            {show && (
-                <div
-                    className="absolute left-0 z-10 mt-2 w-64 p-2 bg-gray-200 text-gray-800 text-sm rounded shadow-lg"
-                    onClick={() => setShow(false)}
-                >
-                    {text}
-                </div>
-            )}
-    </span>
-    );
 };
 
 export default function ZiekZoekenPage() {
     const { language } = useLanguage();
-    const t = translations[language];
+    const t = translations[language as keyof typeof translations] || translations.nl;
 
     const [formData, setFormData] = useState<ZiekZoekenFormData>({
         leverweek: 0,
@@ -127,54 +41,58 @@ export default function ZiekZoekenPage() {
         andereReden: '',
     });
 
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
-    const [showErrorModal, setShowErrorModal] = useState<boolean>(false);
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [showAndereReden, setShowAndereReden] = useState(false);
+    const [showModal, setShowModal] = useState(false);
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        // Converteer de numerieke velden naar een getal
-        if (name === 'leverweek' || name === 'aantalWeggooi') {
-            setFormData(prev => ({ ...prev, [name]: value === '' ? 0 : Number(value) }));
-        } else {
-            setFormData(prev => ({ ...prev, [name]: value }));
+    const redenen = [
+        { label: "Ziekte", value: "ziekte" },
+        { label: "Schade", value: "schade" },
+        { label: "Overproductie", value: "overproductie" },
+        { label: "Anders", value: "anders" },
+    ];
+
+    const handleChange = (name: string, value: string | number) => {
+        setFormData(prev => ({ ...prev, [name]: value }));
+
+        setErrors(prevErrors => {
+            const newErrors = { ...prevErrors };
+            delete newErrors[name];
+            return newErrors;
+        });
+
+        if (name === "redenWeggooi") {
+            setShowAndereReden(value === "anders");
         }
     };
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+        const newErrors: { [key: string]: string } = {};
 
-        if (
-            !formData.leverweek ||
-            !formData.ras.trim() ||
-            !formData.aantalWeggooi ||
-            !formData.redenWeggooi.trim() ||
-            (formData.redenWeggooi === 'anders' && !formData.andereReden.trim())
-        ) {
-            setShowErrorModal(true);
+        if (!formData.leverweek) newErrors.leverweek = "Leverweek is verplicht";
+        if (!formData.ras.trim()) newErrors.ras = "Selecteer een ras";
+        if (!formData.aantalWeggooi) newErrors.aantalWeggooi = "Aantal weggooien is verplicht";
+        if (!formData.redenWeggooi.trim()) newErrors.redenWeggooi = "Reden weggooien is verplicht";
+        if (formData.redenWeggooi === "anders" && !formData.andereReden.trim()) {
+            newErrors.andereReden = "Voer een andere reden in";
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
             return;
         }
 
         try {
-            const payload = {
-                leverweek: formData.leverweek,
-                ras: formData.ras,
-                aantalWeggooi: formData.aantalWeggooi,
-                redenWeggooi: formData.redenWeggooi,
-                andereReden: formData.andereReden,
-            };
-            const response = await fetch('/api/ziek-zoeken', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            await addZiekZoeken(
+                Number(formData.leverweek),
+                formData.ras,
+                Number(formData.aantalWeggooi),
+                formData.redenWeggooi,
+                formData.andereReden
+            );
 
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-
-            await response.json();
-            console.log('Data inserted successfully');
-            setSuccessMessage(t.successMessage);
+            setShowModal(true);
             setFormData({
                 leverweek: 0,
                 ras: '',
@@ -182,139 +100,101 @@ export default function ZiekZoekenPage() {
                 redenWeggooi: '',
                 andereReden: '',
             });
+            setShowAndereReden(false);
+            setErrors({});
         } catch (error) {
-            console.error('Error submitting form:', error);
+            console.error("Fout bij opslaan van ziek zoek gegevens:", error);
         }
     };
 
-    const closeModal = () => setSuccessMessage(null);
-    const closeErrorModal = () => setShowErrorModal(false);
-
     return (
-        <div className="min-h-screen bg-green-100 text-gray-900 relative">
-            <Header />
-            <div className="container mx-auto px-4 py-8">
-                <div className="bg-white shadow rounded-lg p-6">
-                    <h1 className="text-2xl font-bold mb-6">{t.title}</h1>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        {/* Leverweek */}
-                        <div className="form-group">
-                            <label className="block">
-                                {t.leverweekLabel} <InfoIcon text={t.infoLeverweek} />
+        <ProtectedLayout>
+            <div className="min-h-screen bg-green-100 text-gray-900 relative">
+                <Header />
+                <div className="container mx-auto px-4 py-8">
+                    <div className="bg-white shadow rounded-lg p-6">
+                        <h1 className="text-2xl font-bold mb-6">{t.title}</h1>
+                        <form onSubmit={handleSubmit} className="space-y-4">
+
+                            <div className="form-group">
+                                <label className="block">{t.leverweekLabel}</label>
                                 <input
                                     type="number"
                                     name="leverweek"
-                                    value={formData.leverweek === 0 ? '' : formData.leverweek.toString()}
-                                    onChange={handleChange}
+                                    value={formData.leverweek}
+                                    onChange={(e) => handleChange("leverweek", Number(e.target.value))}
                                     className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                                 />
-                            </label>
-                        </div>
-                        {/* Ras */}
-                        <div className="form-group">
-                            <label className="block">
-                                {t.rasLabel} <InfoIcon text={t.infoRas} />
-                                <input
-                                    type="text"
-                                    name="ras"
-                                    value={formData.ras}
-                                    onChange={handleChange}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                                />
-                            </label>
-                        </div>
-                        {/* Aantal Weggooi */}
-                        <div className="form-group">
-                            <label className="block">
-                                {t.aantalWeggooiLabel} <InfoIcon text={t.infoAantalWeggooi} />
+                                {errors.leverweek && <p className="text-red-500 text-sm mt-1">{errors.leverweek}</p>}
+                            </div>
+
+                            <div className="form-group">
+                                <label className="block">{t.rasLabel}</label>
+                                <RasSelect value={formData.ras} onChangeAction={handleChange} />
+                                {errors.ras && <p className="text-red-500 text-sm mt-1">{errors.ras}</p>}
+                            </div>
+
+                            <div className="form-group">
+                                <label className="block">{t.aantalWeggooiLabel}</label>
                                 <input
                                     type="number"
                                     name="aantalWeggooi"
-                                    value={formData.aantalWeggooi === 0 ? '' : formData.aantalWeggooi.toString()}
-                                    onChange={handleChange}
+                                    value={formData.aantalWeggooi}
+                                    onChange={(e) => handleChange("aantalWeggooi", Number(e.target.value))}
                                     className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                                 />
-                            </label>
-                        </div>
-                        {/* Reden Weggooi */}
-                        <div className="form-group">
-                            <label className="block">
-                                {t.redenWeggooiLabel} <InfoIcon text={t.infoRedenWeggooi} />
+                                {errors.aantalWeggooi && <p className="text-red-500 text-sm mt-1">{errors.aantalWeggooi}</p>}
+                            </div>
+
+                            <div className="form-group">
+                                <label className="block">{t.redenWeggooiLabel}</label>
                                 <select
                                     name="redenWeggooi"
                                     value={formData.redenWeggooi}
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange("redenWeggooi", e.target.value)}
                                     className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                                 >
-                                    <option value="">
-                                        {language === 'nl'
-                                            ? "Selecteer reden"
-                                            : language === 'en'
-                                                ? "Select reason"
-                                                : "Wybierz powód"}
-                                    </option>
+                                    <option value="">Selecteer een reden</option>
                                     {redenen.map((reden) => (
                                         <option key={reden.value} value={reden.value}>
                                             {reden.label}
                                         </option>
                                     ))}
                                 </select>
-                            </label>
-                        </div>
-                        {/* Extra veld voor "anders" */}
-                        {formData.redenWeggooi === 'anders' && (
-                            <div className="form-group">
-                                <label className="block">
-                                    {t.andereRedenLabel} <InfoIcon text={t.infoAndereReden} />
+                                {errors.redenWeggooi && <p className="text-red-500 text-sm mt-1">{errors.redenWeggooi}</p>}
+                            </div>
+
+                            {showAndereReden && (
+                                <div className="form-group">
+                                    <label className="block">{t.andereRedenLabel}</label>
                                     <input
                                         type="text"
                                         name="andereReden"
                                         value={formData.andereReden}
-                                        onChange={handleChange}
+                                        onChange={(e) => handleChange("andereReden", e.target.value)}
                                         className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                                     />
-                                </label>
-                            </div>
-                        )}
-                        <button
-                            type="submit"
-                            className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
-                        >
-                            {t.submitButton}
-                        </button>
-                    </form>
+                                    {errors.andereReden && <p className="text-red-500 text-sm mt-1">{errors.andereReden}</p>}
+                                </div>
+                            )}
+
+                            <button type="submit" className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors">
+                                {t.submitButton}
+                            </button>
+                        </form>
+                    </div>
                 </div>
+                {showModal && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                        <div className="bg-white rounded p-6 max-w-sm w-full">
+                            <p className="text-gray-800">{t.successMessage}</p>
+                            <button onClick={() => setShowModal(false)} className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                                OK
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
-
-            {/* Success Modal */}
-            {successMessage && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                    <div className="bg-white rounded p-6 max-w-sm w-full">
-                        <p className="text-gray-800">{t.successMessage}</p>
-                        <button
-                            onClick={closeModal}
-                            className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                        >
-                            OK
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {/* Error Modal */}
-            {showErrorModal && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                    <div className="bg-white rounded p-6 max-w-sm w-full">
-                        <p className="text-red-800">{t.errorMessage}</p>
-                        <button
-                            onClick={closeErrorModal}
-                            className="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-                        >
-                            OK
-                        </button>
-                    </div>
-                </div>
-            )}
-        </div>
+        </ProtectedLayout>
     );
 }

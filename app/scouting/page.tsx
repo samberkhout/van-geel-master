@@ -5,46 +5,48 @@ import Header from '@/components/Header';
 import { useLanguage } from '@/context/LanguageContext';
 import ProtectedLayout from '@/components/ProtectedLayout';
 import RasSelect from '@/components/RasSelect';
-import { addTrips } from "@/app/actions/actions";
+import { addScouting } from "@/app/actions/actions";
 
-interface TripsFormData {
-    soort: string;
+// TypeScript interface voor formulierdata
+interface ScoutingFormData {
     leverweek: number;
+    ras: string;
     oppotweek: number;
-    aantalPlanten: number;
-    locatie: string;
+    bio: number;
+    oorwoorm: boolean;
 }
 
+// Vertalingen
 const translations = {
     nl: {
-        title: "Trips",
-        soortLabel: "Ras",
+        title: "Scouting",
         leverweekLabel: "Leverweek",
+        rasLabel: "Ras",
         oppotweekLabel: "Oppotweek",
-        aantalPlantenLabel: "Aantal Planten",
-        locatieLabel: "Locatie",
+        bioLabel: "Biologisch (0-5)",
+        oorwoormLabel: "Oorworm Aanwezig?",
         submitButton: "Verzenden",
         successMessage: "Formulier succesvol ingediend!",
-        errorMessage: "Vul alle velden in.",
+        errorMessage: "Vul alle velden correct in.",
     },
 };
 
-export default function TripsPage() {
+export default function ScoutingPage() {
     const { language } = useLanguage();
     const t = translations[language as keyof typeof translations] || translations.nl;
 
-    const [formData, setFormData] = useState<TripsFormData>({
-        soort: '',
+    const [formData, setFormData] = useState<ScoutingFormData>({
         leverweek: 0,
+        ras: '',
         oppotweek: 0,
-        aantalPlanten: 0,
-        locatie: '',
+        bio: 0,
+        oorwoorm: false,
     });
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [showModal, setShowModal] = useState(false);
 
-    const handleChange = (name: string, value: string | number) => {
+    const handleChange = (name: string, value: string | number | boolean) => {
         setFormData(prev => ({ ...prev, [name]: value }));
 
         setErrors(prevErrors => {
@@ -58,11 +60,10 @@ export default function TripsPage() {
         e.preventDefault();
         const newErrors: { [key: string]: string } = {};
 
-        if (!formData.soort.trim()) newErrors.soort = "Selecteer een ras";
         if (!formData.leverweek) newErrors.leverweek = "Leverweek is verplicht";
+        if (!formData.ras.trim()) newErrors.ras = "Selecteer een ras";
         if (!formData.oppotweek) newErrors.oppotweek = "Oppotweek is verplicht";
-        if (!formData.aantalPlanten) newErrors.aantalPlanten = "Aantal planten is verplicht";
-        if (!formData.locatie.trim()) newErrors.locatie = "Locatie is verplicht";
+        if (formData.bio < 0 || formData.bio > 5) newErrors.bio = "Bio moet tussen 0 en 5 liggen";
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
@@ -70,25 +71,25 @@ export default function TripsPage() {
         }
 
         try {
-            await addTrips(
-                formData.soort,
+            await addScouting(
                 Number(formData.leverweek),
+                formData.ras,
                 Number(formData.oppotweek),
-                Number(formData.aantalPlanten),
-                formData.locatie
+                Number(formData.bio),
+                Boolean(formData.oorwoorm)
             );
 
             setShowModal(true);
             setFormData({
-                soort: '',
                 leverweek: 0,
+                ras: '',
                 oppotweek: 0,
-                aantalPlanten: 0,
-                locatie: '',
+                bio: 0,
+                oorwoorm: false,
             });
             setErrors({});
         } catch (error) {
-            console.error("Fout bij opslaan van tripsgegevens:", error);
+            console.error("Fout bij opslaan van scoutinggegevens:", error);
         }
     };
 
@@ -102,12 +103,6 @@ export default function TripsPage() {
                         <form onSubmit={handleSubmit} className="space-y-4">
 
                             <div className="form-group">
-                                <label className="block">{t.soortLabel}</label>
-                                <RasSelect value={formData.soort} onChangeAction={handleChange} />
-                                {errors.soort && <p className="text-red-500 text-sm mt-1">{errors.soort}</p>}
-                            </div>
-
-                            <div className="form-group">
                                 <label className="block">{t.leverweekLabel}</label>
                                 <input
                                     type="number"
@@ -117,6 +112,12 @@ export default function TripsPage() {
                                     className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                                 />
                                 {errors.leverweek && <p className="text-red-500 text-sm mt-1">{errors.leverweek}</p>}
+                            </div>
+
+                            <div className="form-group">
+                                <label className="block">{t.rasLabel}</label>
+                                <RasSelect value={formData.ras} onChangeAction={handleChange} />
+                                {errors.ras && <p className="text-red-500 text-sm mt-1">{errors.ras}</p>}
                             </div>
 
                             <div className="form-group">
@@ -132,27 +133,26 @@ export default function TripsPage() {
                             </div>
 
                             <div className="form-group">
-                                <label className="block">{t.aantalPlantenLabel}</label>
+                                <label className="block">{t.bioLabel}</label>
                                 <input
                                     type="number"
-                                    name="aantalPlanten"
-                                    value={formData.aantalPlanten}
-                                    onChange={(e) => handleChange("aantalPlanten", Number(e.target.value))}
+                                    name="bio"
+                                    value={formData.bio}
+                                    onChange={(e) => handleChange("bio", Number(e.target.value))}
                                     className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                                 />
-                                {errors.aantalPlanten && <p className="text-red-500 text-sm mt-1">{errors.aantalPlanten}</p>}
+                                {errors.bio && <p className="text-red-500 text-sm mt-1">{errors.bio}</p>}
                             </div>
 
-                            <div className="form-group">
-                                <label className="block">{t.locatieLabel}</label>
+                            <div className="form-group flex items-center">
                                 <input
-                                    type="text"
-                                    name="locatie"
-                                    value={formData.locatie}
-                                    onChange={(e) => handleChange("locatie", e.target.value)}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                    type="checkbox"
+                                    name="oorwoorm"
+                                    checked={formData.oorwoorm}
+                                    onChange={(e) => handleChange("oorwoorm", e.target.checked)}
+                                    className="mr-2"
                                 />
-                                {errors.locatie && <p className="text-red-500 text-sm mt-1">{errors.locatie}</p>}
+                                <label>{t.oorwoormLabel}</label>
                             </div>
 
                             <button

@@ -4,6 +4,7 @@
 import Link from 'next/link';
 import Header from '@/components/Header';
 import { useLanguage } from '@/context/LanguageContext';
+import ProtectedLayout from "@/components/ProtectedLayout";
 
 const translations = {
     nl: {
@@ -64,6 +65,7 @@ export default function HomePage() {
     const t = translations[language];
 
     return (
+        <ProtectedLayout>
         <div className="min-h-screen bg-green-100 text-gray-900">
             {/* Header met taalkeuzeknoppen */}
             <Header />
@@ -102,5 +104,6 @@ export default function HomePage() {
                 </div>
             </main>
         </div>
+    </ProtectedLayout>
     );
 }

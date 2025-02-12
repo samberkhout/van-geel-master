@@ -9,7 +9,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// Model voor het oppotten formulier
 model Oppotten {
   id            Int      @id @default(autoincrement())
   leverweek     Int
@@ -17,28 +16,63 @@ model Oppotten {
   aantalOpgepot Int
   aantalWeggooi Int
   redenWeggooi  String
-  andereReden   String?  // Optioneel veld
+  andereReden   String?
   createdAt     DateTime @default(now())
 }
 
-// Model voor het trips formulier
 model Trips {
-  id           Int      @id @default(autoincrement())
-  soort        String   // Bijvoorbeeld: het ras of de variëteit
-  leverweek    Int
-  oppotweek    Int
+  id            Int      @id @default(autoincrement())
+  soort         String
+  leverweek     Int
+  oppotweek     Int
   aantalPlanten Int
-  locatie      String
-  createdAt    DateTime @default(now())
+  locatie       String
+  createdAt     DateTime @default(now())
 }
 
-// Model voor het ziek zoeken formulier
 model ZiekZoeken {
-  id           Int      @id @default(autoincrement())
-  leverweek    Int
-  ras          String
+  id            Int      @id @default(autoincrement())
+  leverweek     Int
+  ras           String
   aantalWeggooi Int
-  redenWeggooi String
-  andereReden  String?  // Optioneel veld
-  createdAt    DateTime @default(now())
+  redenWeggooi  String
+  andereReden   String?
+  createdAt     DateTime @default(now())
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String?
+  email     String   @unique
+  password  String?
+  rol       Role     @default(USER)
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model scout {
+  id        String   @id @default(uuid())
+  leverweek Int
+  ras       String
+  oppotweek Int
+  bio       Int
+  oorwoorm  Boolean
+  createdAt DateTime @default(now())
+}
+
+model Leverancier {
+  id      Int     @id @default(autoincrement())
+  naam    String  @unique
+  soorten Soort[]
+}
+
+model Soort {
+  id            Int         @id @default(autoincrement())
+  naam          String
+  leverancierId Int
+  leverancier   Leverancier @relation(fields: [leverancierId], references: [id], onDelete: Cascade)
 }
