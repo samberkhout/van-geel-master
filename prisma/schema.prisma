@@ -76,3 +76,11 @@ model Soort {
   leverancierId Int
   leverancier   Leverancier @relation(fields: [leverancierId], references: [id], onDelete: Cascade)
 }
+
+model QSMgroei {
+  id         Int    @id @default(autoincrement())
+  weekNummer Int
+  jaar       Int
+  soort      String
+  groei      Int
+}
