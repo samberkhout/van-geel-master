@@ -5,6 +5,8 @@ import Header from "@/components/Header";
 import ProtectedLayout from "@/components/ProtectedLayout";
 import { getSoorten, addSoort, deleteSoort, updateSoort } from "@/app/actions/actions";
 import { getLeveranciers } from "@/app/actions/actions";
+import SearchAndAddButton from "@/components/SearchAndAddButton";
+import ItemList from "@/components/ItemList";
 
 interface Soort {
     id: number;
@@ -41,6 +43,15 @@ export default function SoortenPage() {
         const leverancier = leveranciers.find((l) => l.id === leverancierId);
         return leverancier ? leverancier.naam : "Onbekend";
     }
+    function handleAddSoort(){
+        setEditMode(false);
+        setModalOpen(true);
+        setSelectedSoort(null);
+        setSoortNaam("");
+        setLeverancierId("");
+
+    }
+
 
     async function handleSaveSoort(e: React.FormEvent) {
         e.preventDefault();
@@ -95,55 +106,22 @@ export default function SoortenPage() {
                     <div className="bg-white shadow-lg rounded-lg p-6">
                         <h1 className="text-3xl font-bold mb-6 text-center">Soorten</h1>
 
-                        <div className="flex justify-between mb-4">
-                            <input
-                                type="text"
-                                placeholder="Zoek op naam..."
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
-                            />
-                            <button
-                                onClick={() => {
-                                    setEditMode(false);
-                                    setModalOpen(true);
-                                    setSelectedSoort(null);
-                                    setSoortNaam("");
-                                    setLeverancierId("");
-                                }}
-                                className="ml-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                            >
-                                + Toevoegen
-                            </button>
-                        </div>
+                        <SearchAndAddButton
+                            search={search}
+                            setSearch={setSearch}
+                            onAdd={handleAddSoort}
+                            placeholder="Zoek op naam..."
+                        />
 
-                        <ul className="mt-4">
-                            {soorten
-                                .filter((s) => s.naam.toLowerCase().includes(search.toLowerCase()))
-                                .map((s) => (
-                                    <li key={s.id}
-                                        className="flex justify-between items-center border-b border-gray-300 p-3">
-                                        <div>
-                                            <span className="text-lg font-bold">{s.naam}</span>
-                                            <p className="text-sm">Leverancier: {getLeverancierNaam(s.leverancierId)}</p>
-                                        </div>
-                                        <div className="flex space-x-2">
-                                            <button
-                                                onClick={() => handleEditSoort(s)}
-                                                className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600"
-                                            >
-                                                Bewerken
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteSoort(s.id)}
-                                                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
-                                            >
-                                                Verwijderen
-                                            </button>
-                                        </div>
-                                    </li>
-                                ))}
-                        </ul>
+                        <ItemList
+                            items={soorten.filter((s) =>
+                                s.naam.toLowerCase().includes(search.toLowerCase())
+                            )}
+                            getTitle={(s) => s.naam}
+                            getSubtitle={(s) => `Leverancier: ${getLeverancierNaam(s.leverancierId)}`}
+                            onEdit={handleEditSoort}
+                            onDelete={(id) => handleDeleteSoort(Number(id))}
+                        />
                     </div>
                 </div>
 
@@ -152,18 +130,8 @@ export default function SoortenPage() {
                         <div className="bg-white p-6 rounded-lg shadow-lg">
                             <h2 className="text-2xl font-bold mb-4">{editMode ? "Soort bewerken" : "Soort toevoegen"}</h2>
                             <form onSubmit={handleSaveSoort}>
-                                <input
-                                    type="text"
-                                    value={soortNaam}
-                                    onChange={(e) => setSoortNaam(e.target.value)}
-                                    placeholder="Naam soort"
-                                    className="border p-2 rounded w-full text-black focus:ring-1 focus:ring-green-500"
-                                />
-                                <select
-                                    value={leverancierId}
-                                    onChange={(e) => setLeverancierId(e.target.value)}
-                                    className="border p-2 rounded w-full mt-2 text-black focus:ring-1 focus:ring-green-500"
-                                >
+                                <input type="text" value={soortNaam} onChange={(e) => setSoortNaam(e.target.value)} placeholder="Naam soort" className="border p-2 rounded w-full text-black" />
+                                <select value={leverancierId} onChange={(e) => setLeverancierId(e.target.value)} className="border p-2 rounded w-full mt-2 text-black">
                                     <option value="">Selecteer leverancier</option>
                                     {leveranciers.map((lev) => (
                                         <option key={lev.id} value={lev.id}>
@@ -172,19 +140,8 @@ export default function SoortenPage() {
                                     ))}
                                 </select>
                                 <div className="mt-4 flex justify-between">
-                                    <button
-                                        type="button"
-                                        onClick={() => setModalOpen(false)}
-                                        className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
-                                    >
-                                        Annuleren
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                                    >
-                                        {editMode ? "Bijwerken" : "Toevoegen"}
-                                    </button>
+                                    <button type="button" onClick={() => setModalOpen(false)} className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">Annuleren</button>
+                                    <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Opslaan</button>
                                 </div>
                             </form>
                         </div>
@@ -193,4 +150,5 @@ export default function SoortenPage() {
             </div>
         </ProtectedLayout>
     );
+
 }

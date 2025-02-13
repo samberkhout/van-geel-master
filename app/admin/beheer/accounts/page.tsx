@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import ProtectedLayout from "@/components/ProtectedLayout";
 import { getUsers, addUser, deleteUser, updateUser } from "@/app/actions/actions";
-
+import SearchAndAddButton from "@/components/SearchAndAddButton";
+import ItemList from "@/components/ItemList";
 interface User {
     id: string;
     name: string | null;
@@ -70,6 +71,16 @@ export default function AccountsPage() {
         setEditMode(true);
         setModalOpen(true);
     }
+    function handleAddUser() {
+        setEditMode(false);
+        setModalOpen(true);
+        setSelectedUser(null);
+        setName("");
+        setEmail("");
+        setPassword("");
+        setRol("Werknemer");
+    }
+
 
     async function handleDeleteUser(id: string) {
         const confirmDelete = window.confirm("Weet je zeker dat je deze gebruiker wilt verwijderen?");
@@ -92,60 +103,24 @@ export default function AccountsPage() {
                     <div className="bg-white shadow-lg rounded-lg p-6">
                         <h1 className="text-3xl font-bold mb-6 text-center">Accounts Beheer</h1>
 
-                        <div className="flex justify-between mb-4">
-                            <input
-                                type="text"
-                                placeholder="Zoek op naam of e-mail..."
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
-                            />
-                            <button
-                                onClick={() => {
-                                    setEditMode(false);
-                                    setModalOpen(true);
-                                    setSelectedUser(null);
-                                    setName("");
-                                    setEmail("");
-                                    setPassword("");
-                                    setRol("Werknemer");
-                                }}
-                                className="ml-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                            >
-                                + Toevoegen
-                            </button>
-                        </div>
+                        <SearchAndAddButton
+                            search={search}
+                            setSearch={setSearch}
+                            onAdd={handleAddUser}
+                            placeholder="Zoek op naam of e-mail..."
+                        />
 
-                        <ul className="mt-4">
-                            {users
-                                .filter((u) =>
+                        <ItemList
+                            items={users.filter(
+                                (u) =>
                                     u.name?.toLowerCase().includes(search.toLowerCase()) ||
                                     u.email.toLowerCase().includes(search.toLowerCase())
-                                )
-                                .map((u) => (
-                                    <li key={u.id} className="flex justify-between items-center border-b border-gray-300 p-3">
-                                        <div>
-                                            <span className="text-lg font-bold">{u.name || "Geen naam"}</span>
-                                            <p className="text-sm">{u.email}</p>
-                                            <p className="text-xs font-semibold">Rol: {getFormattedRole(u.rol)}</p>
-                                        </div>
-                                        <div className="flex space-x-2">
-                                            <button
-                                                onClick={() => handleEditUser(u)}
-                                                className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600"
-                                            >
-                                                Bewerken
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteUser(u.id)}
-                                                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
-                                            >
-                                                Verwijderen
-                                            </button>
-                                        </div>
-                                    </li>
-                                ))}
-                        </ul>
+                            )}
+                            getTitle={(user) => user.name || "Geen naam"}
+                            getSubtitle={(user) => user.email}
+                            onEdit={handleEditUser}
+                            onDelete={(id) => handleDeleteUser(String(id))}
+                        />
                     </div>
                 </div>
 
@@ -154,33 +129,10 @@ export default function AccountsPage() {
                         <div className="bg-white p-6 rounded-lg shadow-lg">
                             <h2 className="text-2xl font-bold mb-4">{editMode ? "Gebruiker bewerken" : "Account toevoegen"}</h2>
                             <form onSubmit={handleSaveUser}>
-                                <input
-                                    type="text"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    placeholder="Naam (optioneel)"
-                                    className="border p-2 rounded w-full text-black focus:ring-1 focus:ring-green-500"
-                                />
-                                <input
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="E-mail"
-                                    required
-                                    className="border p-2 rounded w-full mt-2 text-black focus:ring-1 focus:ring-green-500"
-                                />
-                                <input
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder={editMode ? "Nieuw wachtwoord (optioneel)" : "Wachtwoord"}
-                                    className="border p-2 rounded w-full mt-2 text-black focus:ring-1 focus:ring-green-500"
-                                />
-                                <select
-                                    value={rol}
-                                    onChange={(e) => setRol(e.target.value)}
-                                    className="border p-2 rounded w-full mt-2 text-black focus:ring-1 focus:ring-green-500"
-                                >
+                                <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Naam (optioneel)" className="border p-2 rounded w-full text-black" />
+                                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="E-mail" required className="border p-2 rounded w-full mt-2 text-black" />
+                                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={editMode ? "Nieuw wachtwoord (optioneel)" : "Wachtwoord"} className="border p-2 rounded w-full mt-2 text-black" />
+                                <select value={rol} onChange={(e) => setRol(e.target.value)} className="border p-2 rounded w-full mt-2 text-black">
                                     <option value="Werknemer">Werknemer</option>
                                     <option value="Beheerder">Beheerder</option>
                                 </select>
