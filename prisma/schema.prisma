@@ -1,18 +1,47 @@
-// prisma/schema.prisma
-
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DIRECT_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
 }
 
+model Plant {
+  id         Int          @id @default(autoincrement())
+  leverweek  Int
+  soortId    Int
+  soort      Soort        @relation(fields: [soortId], references: [id], onDelete: Cascade)
+  Oppotten   Oppotten[]
+  Trips      Trips[]
+  ZiekZoeken ZiekZoeken[]
+  scout      scout[]
+
+  createdAt DateTime @default(now())
+}
+
+model Soort {
+  id            Int         @id @default(autoincrement())
+  naam          String
+  leverancierId Int
+  leverancier   Leverancier @relation(fields: [leverancierId], references: [id], onDelete: Cascade)
+
+  planten    Plant[]
+  oppotten   Oppotten[]
+  trips      Trips[]
+  ziekZoeken ZiekZoeken[]
+  scouts     scout[]
+
+  @@unique([leverancierId, naam])
+}
+
 model Oppotten {
   id            Int      @id @default(autoincrement())
+  plantId       Int      @unique
+  plant         Plant    @relation(fields: [plantId], references: [id])
   leverweek     Int
-  ras           String
+  soortId       Int
+  soort         Soort    @relation(fields: [soortId], references: [id], onDelete: Cascade)
   aantalOpgepot Int
   aantalWeggooi Int
   redenWeggooi  String
@@ -22,22 +51,49 @@ model Oppotten {
 
 model Trips {
   id            Int      @id @default(autoincrement())
-  soort         String
+  plantId       Int      @unique
+  plant         Plant    @relation(fields: [plantId], references: [id])
+  soortId       Int
+  soort         Soort    @relation(fields: [soortId], references: [id], onDelete: Cascade)
   leverweek     Int
   oppotweek     Int
   aantalPlanten Int
-  locatie       String
+  locatie       Json
   createdAt     DateTime @default(now())
 }
 
 model ZiekZoeken {
   id            Int      @id @default(autoincrement())
+  plantId       Int      @unique
+  plant         Plant    @relation(fields: [plantId], references: [id])
+  soortId       Int
+  soort         Soort    @relation(fields: [soortId], references: [id], onDelete: Cascade)
   leverweek     Int
-  ras           String
   aantalWeggooi Int
   redenWeggooi  String
   andereReden   String?
   createdAt     DateTime @default(now())
+}
+
+model scout {
+  id        Int      @id @default(autoincrement())
+  plantId   Int      @unique
+  plant     Plant    @relation(fields: [plantId], references: [id])
+  soortId   Int
+  soort     Soort    @relation(fields: [soortId], references: [id], onDelete: Cascade)
+  leverweek Int
+  oppotweek Int
+  bio       Int
+  oorwoorm  Boolean
+  createdAt DateTime @default(now())
+}
+
+model QSMgroei {
+  id         Int    @id @default(autoincrement())
+  weekNummer Int
+  jaar       Int
+  soort      String
+  groei      Int
 }
 
 model User {
@@ -54,33 +110,8 @@ enum Role {
   ADMIN
 }
 
-model scout {
-  id        String   @id @default(uuid())
-  leverweek Int
-  ras       String
-  oppotweek Int
-  bio       Int
-  oorwoorm  Boolean
-  createdAt DateTime @default(now())
-}
-
 model Leverancier {
   id      Int     @id @default(autoincrement())
   naam    String  @unique
   soorten Soort[]
-}
-
-model Soort {
-  id            Int         @id @default(autoincrement())
-  naam          String
-  leverancierId Int
-  leverancier   Leverancier @relation(fields: [leverancierId], references: [id], onDelete: Cascade)
-}
-
-model QSMgroei {
-  id         Int    @id @default(autoincrement())
-  weekNummer Int
-  jaar       Int
-  soort      String
-  groei      Int
 }

@@ -22,7 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <SessionProvider> {/* ✅ Wrap alle pagina's in de juiste SessionProvider */}
+        <SessionProvider>
             <LanguageProvider>
                 {children}
             </LanguageProvider>

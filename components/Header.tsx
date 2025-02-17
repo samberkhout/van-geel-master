@@ -2,23 +2,17 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useLanguage, Language } from "@/context/LanguageContext";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 
 export default function Header() {
-    const { language, setLanguage } = useLanguage();
+
     const { data: session } = useSession();
     const pathname = usePathname();
     const [menuOpen, setMenuOpen] = useState(false);
     const [accountMenuOpen, setAccountMenuOpen] = useState(false);
     const [adminMenuOpen, setAdminMenuOpen] = useState(false);
-
-
-    const changeLanguage = (lang: Language) => {
-        setLanguage(lang);
-    };
 
     const activeLinkClass = (href: string) =>
         pathname === href
@@ -47,6 +41,9 @@ export default function Header() {
                     </Link>
                     <Link href="/ziek-zoeken" className={activeLinkClass("/ziek-zoeken")}>
                         Ziek Zoeken
+                    </Link>
+                    <Link href="/invoeren" className={activeLinkClass("/invoeren")}>
+                        invoer vandaag
                     </Link>
                     <Link href="/scouting" className={activeLinkClass("/scouting")}>Scouting</Link>
                     {session?.user?.role === "ADMIN" && (
@@ -79,32 +76,7 @@ export default function Header() {
                         </div>
                     </div>
                         )}
-                    <div className="flex space-x-2">
-                        <button
-                            onClick={() => changeLanguage("nl")}
-                            className={`px-2 py-1 border rounded ${
-                                language === "nl" ? "bg-white text-green-800" : "bg-green-800 text-white"
-                            }`}
-                        >
-                            NL
-                        </button>
-                        <button
-                            onClick={() => changeLanguage("en")}
-                            className={`px-2 py-1 border rounded ${
-                                language === "en" ? "bg-white text-green-800" : "bg-green-800 text-white"
-                            }`}
-                        >
-                            EN
-                        </button>
-                        <button
-                            onClick={() => changeLanguage("pl")}
-                            className={`px-2 py-1 border rounded ${
-                                language === "pl" ? "bg-white text-green-800" : "bg-green-800 text-white"
-                            }`}
-                        >
-                            PL
-                        </button>
-                    </div>
+
 
                     {session?.user ? (
                         <div className="relative group">
@@ -181,6 +153,9 @@ export default function Header() {
                           className="block hover:bg-green-600 px-4 py-2 rounded-md"
                           onClick={()=> setMenuOpen(false)}>
                         Scouting
+                    </Link>
+                    <Link href="/invoeren" className={activeLinkClass("/invoeren")}>
+                        invoer vandaag
                     </Link>
                     {session?.user?.role === "ADMIN" && (
                         <div>

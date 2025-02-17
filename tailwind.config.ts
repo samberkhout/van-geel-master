@@ -12,6 +12,9 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      gridTemplateColumns: {
+        20: "repeat(20, minmax(0, 1fr))", // Voeg een 20x20 grid toe voor de heatmap
+      },
     },
   },
   plugins: [],
