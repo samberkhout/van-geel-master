@@ -22,82 +22,42 @@ export default function Header() {
 
     return (
         <header className="bg-green-800 text-white">
-            <div className="max-w-8xl mx-auto px-24 py-4 flex items-center justify-between">
+            <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                 {/* Logo */}
                 <Link href="/">
-                    <Image src="/logo.png" alt="Logo" width={192} height={48} className="w-24 h-auto " />
+                    <Image src="/logo.png" alt="Logo" width={192} height={48} className="w-24 h-auto" />
                 </Link>
 
                 {/* Desktop navigatie */}
-                <nav className="hidden md:flex items-center space-x-6 " >
-                    <Link href="/oppotten" className={activeLinkClass("/oppotten")}>
-                        Oppotten
+                <nav className="hidden md:flex items-center space-x-6">
+                    <Link href="/bromelia" className={activeLinkClass("/")}>
+                        Home
                     </Link>
-
-                    <Link href="/trips" className={activeLinkClass("/trips")}>
-                        Trips
+                    <Link href="/bromelia/gasInvoer" className={activeLinkClass("/")}>
+                        Gas Invoer
                     </Link>
-                    <Link href="/ziek-zoeken" className={activeLinkClass("/ziek-zoeken")}>
-                        Ziek Zoeken
-                    </Link>
-                    <Link href="/scouting" className={activeLinkClass("/scouting")}>Scouting</Link>
-                    <Link href="/invoeren" className={activeLinkClass("/invoeren")}>
-                        invoer vandaag
-                    </Link>
-                    {/*{session?.user?.role === "admin" && (*/}
-                    {/*    <div className="relative group">*/}
-                    {/*        <button className="text-white px-4 py-2 rounded-md">*/}
-                    {/*            week rapport*/}
-                    {/*        </button>*/}
-                    {/*        <div*/}
-                    {/*            className="absolute right-0 top-full w-48 bg-white text-black shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 pointer-events-auto">*/}
-                    {/*            <ul className="py-2">*/}
-                    {/*                <li>*/}
-                    {/*                    <Link href="/WeekRapport/QSMgroei"*/}
-                    {/*                          className="block px-4 py-2 hover:bg-gray-200">*/}
-                    {/*                        QSM groei*/}
-                    {/*                    </Link>*/}
-                    {/*                </li>*/}
-                    {/*                <li>*/}
-                    {/*                    <Link href="/WeekRapport/gemTak"*/}
-                    {/*                          className="block px-4 py-2 hover:bg-gray-200">*/}
-                    {/*                        Gem tak*/}
-                    {/*                    </Link>*/}
-                    {/*                </li>*/}
-                    {/*                <li>*/}
-                    {/*                    <Link*/}
-                    {/*                        href="/WeekRapport/invoer"*/}
-                    {/*                        className="block px-4 py-2 hover:bg-gray-200">*/}
-                    {/*                        Invoeren*/}
-                    {/*                    </Link>*/}
-                    {/*                </li>*/}
-                    {/*            </ul>*/}
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*)}*/}
                     {session?.user?.role === "ADMIN" && (
-                        <div className="relative group">
-                            <button className=" text-white px-4 py-2 rounded-md">
-                                beheer ▼
-                            </button>
-                            <div
-                                className="absolute right-0 top-full w-48 bg-white text-black shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 pointer-events-auto">
-                                <ul className="py-2">
-                                    <li>
-                                        <Link href="/admin/beheer/leveranciers"
-                                              className="block px-4 py-2 hover:bg-gray-200">
-                                            leveranciers
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link href="/admin/beheer/soorten"
-                                              className="block px-4 py-2 hover:bg-gray-200">
-                                            soorten
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link
-                                            href="/admin/beheer/accounts"
+                    <div className="relative group">
+                        <button className=" text-white px-4 py-2 rounded-md">
+                            beheer ▼
+                        </button>
+                        <div
+                            className="absolute right-0 top-full w-48 bg-white text-black shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 pointer-events-auto">
+                            <ul className="py-2">
+                                <li>
+                                    <Link href="/admin/beheer/leveranciers"
+                                          className="block px-4 py-2 hover:bg-gray-200">
+                                        leveranciers
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link href="/admin/beheer/soorten" className="block px-4 py-2 hover:bg-gray-200">
+                                        soorten
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                    href="/admin/beheer/accounts"
                                     className="block px-4 py-2 hover:bg-gray-200">
                                         accounts
                                     </Link>
@@ -152,40 +112,14 @@ export default function Header() {
             {menuOpen && (
                 <nav className="md:hidden bg-green-700 px-6 py-4 space-y-2">
                     <Link
-                        href="/"
+                        href="/bromelia"
                         className="block hover:bg-green-600 px-4 py-2 rounded-md"
                         onClick={() => setMenuOpen(false)}
                     >
                         Home
-                    </Link>
-                    <Link
-                        href="/oppotten"
-                        className="block hover:bg-green-600 px-4 py-2 rounded-md"
-                        onClick={() => setMenuOpen(false)}
-                    >
-                        Oppotten
-                    </Link>
-                    <Link
-                        href="/trips"
-                        className="block hover:bg-green-600 px-4 py-2 rounded-md"
-                        onClick={() => setMenuOpen(false)}
-                    >
-                    Trips
-                    </Link>
-                    <Link
-                        href="/ziek-zoeken"
-                        className="block hover:bg-green-600 px-4 py-2 rounded-md"
-                        onClick={() => setMenuOpen(false)}
-                    >
-                        Ziek Zoeken
-                    </Link>
-                    <Link href="/scouting"
-                          className="block hover:bg-green-600 px-4 py-2 rounded-md"
-                          onClick={()=> setMenuOpen(false)}>
-                        Scouting
-                    </Link>
-                    <Link href="/invoeren" className={activeLinkClass("/invoeren")}>
-                        invoer vandaag
+                        </Link>
+                    <Link href="/bromelia/gasInvoer" className={activeLinkClass("/")} onClick={() => setMenuOpen(false)}>
+                        Gas Invoer
                     </Link>
                     {session?.user?.role === "ADMIN" && (
                         <div>

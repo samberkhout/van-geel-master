@@ -1,4 +1,4 @@
-// /app/page.tsx
+﻿// /app/page.tsx
 'use client';
 
 import Link from 'next/link';
@@ -66,44 +66,27 @@ export default function HomePage() {
 
     return (
         <ProtectedLayout>
-        <div className="min-h-screen bg-green-100 text-gray-900">
+            <div className="min-h-screen bg-green-100 text-gray-900">
 
-            <Header />
+                <Header />
 
-            <main className="container mx-auto px-4 py-8">
-                <h1 className="text-3xl font-bold mb-8">{t.welcome}</h1>
-                <p className="mb-8">{t.description}</p>
+                <main className="container mx-auto px-4 py-8">
+                    <h1 className="text-3xl font-bold mb-8">{t.welcome}</h1>
+                    <p className="mb-8">{t.description}</p>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-8">
-                    {/* Oppotten */}
-                    <div className="bg-white shadow rounded-lg p-6">
-                        <h2 className="text-2xl font-semibold mb-4">{t.oppottenTitle}</h2>
-                        <p className="mb-4">{t.oppottenDescription}</p>
-                        <Link href="/oppotten" className="text-green-600 hover:underline font-bold">
-                            {t.oppottenLink}
-                        </Link>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-8">
+                        {/* Oppotten */}
+                        <div className="bg-white shadow rounded-lg p-6">
+                            <h2 className="text-2xl font-semibold mb-4">{t.oppottenTitle}</h2>
+                            <p className="mb-4">{t.oppottenDescription}</p>
+                            <Link href="/oppotten" className="text-green-600 hover:underline font-bold">
+                                {t.oppottenLink}
+                            </Link>
+                        </div>
+                        
                     </div>
-
-                    {/* Trips */}
-                    <div className="bg-white shadow rounded-lg p-6">
-                        <h2 className="text-2xl font-semibold mb-4">{t.tripsTitle}</h2>
-                        <p className="mb-4">{t.tripsDescription}</p>
-                        <Link href="/trips" className="text-green-600 hover:underline font-bold">
-                            {t.tripsLink}
-                        </Link>
-                    </div>
-
-                    {/* Ziek Zoeken */}
-                    <div className="bg-white shadow rounded-lg p-6">
-                        <h2 className="text-2xl font-semibold mb-4">{t.ziekZoekenTitle}</h2>
-                        <p className="mb-4">{t.ziekZoekenDescription}</p>
-                        <Link href="/ziek-zoeken" className="text-green-600 hover:underline font-bold">
-                            {t.ziekZoekenLink}
-                        </Link>
-                    </div>
-                </div>
-            </main>
-        </div>
-    </ProtectedLayout>
+                </main>
+            </div>
+        </ProtectedLayout>
     );
 }

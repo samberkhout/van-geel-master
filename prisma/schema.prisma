@@ -18,6 +18,7 @@ model Plant {
   scout      scout[]
 
   createdAt DateTime @default(now())
+  gas       gas[]
 }
 
 model Soort {
@@ -31,13 +32,14 @@ model Soort {
   trips      Trips[]
   ziekZoeken ZiekZoeken[]
   scouts     scout[]
+  gas        gas[]
 
   @@unique([leverancierId, naam])
 }
 
 model Oppotten {
   id            Int      @id @default(autoincrement())
-  plantId       Int      @unique
+  plantId       Int
   plant         Plant    @relation(fields: [plantId], references: [id])
   leverweek     Int
   soortId       Int
@@ -51,7 +53,7 @@ model Oppotten {
 
 model Trips {
   id            Int      @id @default(autoincrement())
-  plantId       Int      @unique
+  plantId       Int
   plant         Plant    @relation(fields: [plantId], references: [id])
   soortId       Int
   soort         Soort    @relation(fields: [soortId], references: [id], onDelete: Cascade)
@@ -64,7 +66,7 @@ model Trips {
 
 model ZiekZoeken {
   id            Int      @id @default(autoincrement())
-  plantId       Int      @unique
+  plantId       Int
   plant         Plant    @relation(fields: [plantId], references: [id])
   soortId       Int
   soort         Soort    @relation(fields: [soortId], references: [id], onDelete: Cascade)
@@ -77,7 +79,7 @@ model ZiekZoeken {
 
 model scout {
   id        Int      @id @default(autoincrement())
-  plantId   Int      @unique
+  plantId   Int
   plant     Plant    @relation(fields: [plantId], references: [id])
   soortId   Int
   soort     Soort    @relation(fields: [soortId], references: [id], onDelete: Cascade)
@@ -114,4 +116,16 @@ model Leverancier {
   id      Int     @id @default(autoincrement())
   naam    String  @unique
   soorten Soort[]
+}
+
+model gas {
+  id        Int      @id @default(autoincrement())
+  plant     Plant    @relation(fields: [plantId], references: [id])
+  plantId   Int
+  soort     Soort    @relation(fields: [soortId], references: [id])
+  soortId   Int
+  leverweek Int
+  gasweek   Int
+  aantal    Int
+  createdAt DateTime @default(now())
 }

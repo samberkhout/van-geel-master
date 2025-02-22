@@ -8,8 +8,9 @@ import { withAccelerate } from "@prisma/extension-accelerate";
 const prisma = new PrismaClient().$extends(withAccelerate());
 
 async function getOrCreatePlant(leverweek: number, soortId: number) {
-    let plant = await prisma.plant.findFirst({ where: { leverweek, soortId } });
 
+    let plant = await prisma.plant.findFirst({ where: { leverweek, soortId } });
+   console.log(plant);
     if (!plant) {
         plant = await prisma.plant.create({
             data: { leverweek, soortId },
@@ -434,6 +435,111 @@ export async function getHeatmapData() {
     });
 
     return heatmap;
+}
+// Voeg deze functies toe in actions.ts
+
+export async function getTripsEntriesExport() {
+    return prisma.trips.findMany({
+        select: {
+            id: true,
+            leverweek: true,
+            oppotweek: true,
+            aantalPlanten: true,
+            locatie: true,
+            createdAt: true,
+            soort: {
+                select: {
+                    naam: true,
+                    leverancier: {
+                        select: { naam: true },
+                    },
+                },
+            },
+        },
+    });
+}
+
+export async function getOppottenEntriesExport() {
+    return prisma.oppotten.findMany({
+        select: {
+            id: true,
+            leverweek: true,
+            aantalOpgepot: true,
+            aantalWeggooi: true,
+            redenWeggooi: true,
+            andereReden: true,
+            createdAt: true,
+            soort: {
+                select: {
+                    naam: true,
+                    leverancier: {
+                        select: { naam: true },
+                    },
+                },
+            },
+        },
+    });
+}
+
+export async function getScoutingEntriesExport() {
+    return prisma.scout.findMany({
+        select: {
+            id: true,
+            leverweek: true,
+            oppotweek: true,
+            bio: true,
+            oorwoorm: true,
+            createdAt: true,
+            soort: {
+                select: {
+                    naam: true,
+                    leverancier: {
+                        select: { naam: true },
+                    },
+                },
+            },
+        },
+    });
+}
+
+export async function getZiekZoekenEntriesExport() {
+    return prisma.ziekZoeken.findMany({
+        select: {
+            id: true,
+            leverweek: true,
+            aantalWeggooi: true,
+            redenWeggooi: true,
+            andereReden: true,
+            createdAt: true,
+            soort: {
+                select: {
+                    naam: true,
+                    leverancier: {
+                        select: { naam: true },
+                    },
+                },
+            },
+        },
+    });
+}
+
+export async function addLevering(soortNaam: string, leverweek: number, gasweek: number, aantal: number) {
+    const soort = await prisma.soort.findFirst({ where: { naam: soortNaam } });
+    if (!soort) throw new Error(`Soort ${soortNaam} bestaat niet.`);
+
+    const plantId = await getOrCreatePlant(leverweek, soort.id);
+
+    await prisma.gas.create({
+        data: {
+            plantId,
+            soortId: soort.id,
+            leverweek,
+            gasweek,
+            aantal,
+        },
+    });
+
+    revalidatePath("/gasInvoer");
 }
 
 
