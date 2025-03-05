@@ -15,7 +15,6 @@
     "bcryptjs": "^2.4.3",
     "chartjs-plugin-annotation": "^3.1.0",
     "docx": "^9.2.0",
-    "chart.js-node-canvas": "^4.1.6",
     "exceljs": "^4.4.0",
     "fs": "^0.0.1-security",
     "heatmap.js": "^2.0.5",
