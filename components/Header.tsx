@@ -44,41 +44,47 @@ export default function Header() {
                     <Link href="/invoeren" className={activeLinkClass("/invoeren")}>
                         invoer vandaag
                     </Link>
-                    {/*{session?.user?.role === "admin" && (*/}
-                    {/*    <div className="relative group">*/}
-                    {/*        <button className="text-white px-4 py-2 rounded-md">*/}
-                    {/*            week rapport*/}
-                    {/*        </button>*/}
-                    {/*        <div*/}
-                    {/*            className="absolute right-0 top-full w-48 bg-white text-black shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 pointer-events-auto">*/}
-                    {/*            <ul className="py-2">*/}
-                    {/*                <li>*/}
-                    {/*                    <Link href="/WeekRapport/QSMgroei"*/}
-                    {/*                          className="block px-4 py-2 hover:bg-gray-200">*/}
-                    {/*                        QSM groei*/}
-                    {/*                    </Link>*/}
-                    {/*                </li>*/}
-                    {/*                <li>*/}
-                    {/*                    <Link href="/WeekRapport/gemTak"*/}
-                    {/*                          className="block px-4 py-2 hover:bg-gray-200">*/}
-                    {/*                        Gem tak*/}
-                    {/*                    </Link>*/}
-                    {/*                </li>*/}
-                    {/*                <li>*/}
-                    {/*                    <Link*/}
-                    {/*                        href="/WeekRapport/invoer"*/}
-                    {/*                        className="block px-4 py-2 hover:bg-gray-200">*/}
-                    {/*                        Invoeren*/}
-                    {/*                    </Link>*/}
-                    {/*                </li>*/}
-                    {/*            </ul>*/}
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*)}*/}
+                    {session?.user?.role === "ADMIN" && (
+                        <div className="relative group">
+                            <button className="text-white px-4 py-2 rounded-md">
+                                week rapport
+                            </button>
+                            <div
+                                className="absolute right-0 top-full w-48 bg-white text-black shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 pointer-events-auto">
+                                <ul className="py-2">
+                                    <li>
+                                        <Link href="/WeekRapport/QSMgroei"
+                                              className="block px-4 py-2 hover:bg-gray-200">
+                                            QSM groei
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href="/WeekRapport/GemTak"
+                                              className="block px-4 py-2 hover:bg-gray-200">
+                                            Gem tak
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href="/WeekRapport/Potworm"
+                                              className="block px-4 py-2 hover:bg-gray-200">
+                                            Potworm
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link
+                                            href="/WeekRapport/invoer"
+                                            className="block px-4 py-2 hover:bg-gray-200">
+                                            Invoeren
+                                        </Link>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    )}
                     {session?.user?.role === "ADMIN" && (
                         <div className="relative group">
                             <button className=" text-white px-4 py-2 rounded-md">
-                                beheer ▼
+                            beheer ▼
                             </button>
                             <div
                                 className="absolute right-0 top-full w-48 bg-white text-black shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 pointer-events-auto">

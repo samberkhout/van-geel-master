@@ -129,3 +129,25 @@ model gas {
   aantal    Int
   createdAt DateTime @default(now())
 }
+
+model Potworm {
+  id        Int      @id @default(autoincrement())
+  jaar      Int
+  week      Int
+  afd1      Float?
+  afd16     Float?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GemTak {
+  id             Int      @id @default(autoincrement())
+  jaar           Int
+  week           Int
+  tak1           Float?
+  tak2           Float?
+  tak3           Float?
+  gemTakPerPlant Float?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}

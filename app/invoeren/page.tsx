@@ -46,7 +46,7 @@ const Modal: React.FC<{ onClose: () => void; children: React.ReactNode }> = ({ o
 export default function TodayEntriesPage() {
     const [entries, setEntries] = useState<Entry[]>([]);
     const [search, setSearch] = useState("");
-    const [filter, setFilter] = useState<"Alles" | "Trips" | "Oppotten" | "Scouting" | "Ziek zoeken">("Alles");
+    const [filter, setFilter] = useState<"Trips" | "Oppotten" | "Scouting" | "Ziek zoeken">("Oppotten");
     const [editingEntry, setEditingEntry] = useState<Entry | null>(null);
 
     useEffect(() => {
@@ -84,11 +84,11 @@ export default function TodayEntriesPage() {
                             <select
                                 value={filter}
                                 onChange={(e) =>
-                                    setFilter(e.target.value as "Alles" | "Trips" | "Oppotten" | "Scouting" | "Ziek zoeken")
+                                    setFilter(e.target.value as  "Trips" | "Oppotten" | "Scouting" | "Ziek zoeken")
                                 }
                                 className="border px-4 py-2 rounded-md bg-white text-black"
                             >
-                                <option value="Alles">Alles</option>
+
                                 <option value="Trips">Trips</option>
                                 <option value="Oppotten">Oppotten</option>
                                 <option value="Scouting">Scouting</option>
@@ -99,7 +99,7 @@ export default function TodayEntriesPage() {
                         <ItemList
                             items={entries.filter(
                                 (entry) =>
-                                    (filter === "Alles" || entry.type === filter) &&
+                                    (filter === "Oppotten" || entry.type === filter) &&
                                     (entry.ras.toLowerCase().includes(search.toLowerCase()) ||
                                         entry.type.toLowerCase().includes(search.toLowerCase()))
                             )}

@@ -542,6 +542,84 @@ export async function addLevering(soortNaam: string, leverweek: number, gasweek:
     revalidatePath("/gasInvoer");
 }
 
+export async function getPotwormData() {
+    return prisma.potworm.findMany({
+        orderBy: [
+            { jaar: 'asc' },
+            { week: 'asc' }
+        ]
+    });
+}
+
+
+export async function getGemTakData() {
+    return prisma.gemTak.findMany({
+        orderBy: [
+            { jaar: 'asc' },
+            { week: 'asc' }
+        ]
+    });
+}
+
+export async function addPotwormData(jaar: number, week: number, afd1: number, afd16: number) {
+    try {
+        await prisma.potworm.create({
+            data: {
+                jaar,
+                week,
+                afd1,
+                afd16,
+            },
+        });
+        console.log("Potworm data succesvol opgeslagen!");
+    } catch (error) {
+        console.error("Fout bij het opslaan van Potworm data:", error);
+    }
+}
+
+export async function addQSMgroeiData(jaar: number, weekNummer: number, soort: string, groei: number) {
+    try {
+        await prisma.qSMgroei.create({
+            data: {
+                jaar,
+                weekNummer,
+                soort,
+                groei,
+            },
+        });
+        console.log("QSM Groei data succesvol opgeslagen!");
+    } catch (error) {
+        console.error("Fout bij het opslaan van QSM Groei data:", error);
+    }
+}
+
+export async function addGemTakData(
+    jaar: number,
+    week: number,
+    tak1: number,
+    tak2: number,
+    tak3: number,
+    gemTakPerPlant: number
+) {
+    try {
+        await prisma.gemTak.create({
+            data: {
+                jaar,
+                week,
+                tak1,
+                tak2,
+                tak3,
+                gemTakPerPlant
+            },
+        });
+        console.log("Gemiddelde Takken data succesvol opgeslagen!");
+    } catch (error) {
+        console.error("Fout bij het opslaan van Gemiddelde Takken data:", error);
+    }
+}
+
+
+
 
 
 
